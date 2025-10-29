@@ -109,7 +109,7 @@ pub async fn health_check() -> impl Responder {
 
 pub fn clean_user_file_req(
     base_path: &str,
-    user_file_request: String,
+    user_file_request: &str,
     file_extension: &str,
 ) -> Result<PathBuf, HttpResponse> {
     let normalized_file_req = user_file_request.nfc().collect::<String>();
