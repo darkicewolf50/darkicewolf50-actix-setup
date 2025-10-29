@@ -21,18 +21,12 @@ jobs:
 
       - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Setup Forgejo registry
-        run: |
-          mkdir -p ~/.cargo
-          printf '[registries]\nforgejo = { index = "sparse+https://forge.ucalgarybaja.ca/api/packages/darkicewolf50/cargo/" }\n' > ~/.cargo/config.toml
-          printf '[registries.forgejo]\n' > ~/.cargo/credentials.toml
-          printf 'token = "Bearer %s"\n' "${{ secrets.FORGEJO_CRATES_TOKEN }}" >> ~/.cargo/credentials.toml
 
       - name: Check
         run: cargo check
       
       - name: All Tests
         run: cargo test --no-fail-fast --quiet
-      - name: Publish
-        run: cargo publish --registry forgejo
+
+      # - name: Publish
+      #   run: cargo publish --registry forgejo
