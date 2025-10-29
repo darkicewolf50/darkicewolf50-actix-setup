@@ -6,6 +6,7 @@ authors = ["Brock Tomlinson <brock@darkicewolf50.dev>"]
 license = "Apache-2.0"
 repository = "https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup"
 description = "Includes a health check function, and a logger"
+publish = ["forgejo"]
 
 [dependencies]
 actix-web = "4"
