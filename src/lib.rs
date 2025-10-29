@@ -15,7 +15,7 @@ use serde_json::json;
 /// # Example
 /// ```rust
 /// // this is how a public but internal module would be used by an outside user (ex_crate needs to be changed)
-/// use ucalg_baja_cloud::log_incoming;
+/// use darkicewolf50_actix_setup::log_incoming;
 /// let result = log_incoming("GET", "/");
 /// // unit value and should only be printed to the terminal
 /// assert_eq!(result, ())
@@ -41,13 +41,13 @@ pub fn log_incoming(method: &'static str, path_source: &str) {
 ///
 /// # Example
 /// ```rust
-/// use ucalg_baja_cloud::hello;
+/// use darkicewolf50_actix_setup::health_check;
 /// use actix_web::{web, test, App};
 /// use serde_json::json;
 ///
 /// #[actix_web::test]
 /// async fn test_hello() {
-///     let app = test::init_service(App::new().service(hello)).await;
+///     let app = test::init_service(App::new().service(health_check)).await;
 ///     let req = test::TestRequest::get().uri("/").to_request();
 ///     let resp: serde_json::Value = test::call_and_read_body_json(&app, req).await;
 ///
