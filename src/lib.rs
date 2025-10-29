@@ -91,7 +91,7 @@ pub async fn health_check() -> impl Responder {
 /// use std::path::Path;
 /// use darkicewolf50_actix_setup::clean_user_file_req;
 ///
-/// let result = clean_user_file_req("/database", "test".to_string(), "txt").unwrap();
+/// let result = clean_user_file_req("/database", "test", "txt").unwrap();
 ///
 /// assert_eq!(result, Path::new("/database/test.txt"))
 /// ```
@@ -99,7 +99,7 @@ pub async fn health_check() -> impl Responder {
 /// ```rust
 /// use std::path::Path;
 /// use darkicewolf50_actix_setup::clean_user_file_req;
-/// let result = clean_user_file_req("/database", "test".to_string(), ".txt").unwrap();
+/// let result = clean_user_file_req("/database", "test", ".txt").unwrap();
 ///
 /// assert_eq!(result, Path::new("/database/test.txt"))
 /// ```
