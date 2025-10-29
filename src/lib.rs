@@ -89,17 +89,17 @@ pub async fn health_check() -> impl Responder {
 /// # Example
 /// ```rust
 /// use std::path::Path;
-/// use darkicewolf50_actix_setup::clean_file_user_path;
+/// use darkicewolf50_actix_setup::clean_user_file_req;
 ///
-/// let result = clean_file_user_path("/database", "test".to_string(), "txt").unwrap();
+/// let result = clean_user_file_req("/database", "test".to_string(), "txt").unwrap();
 ///
 /// assert_eq!(result, Path::new("/database/test.txt"))
 /// ```
 ///
 /// ```rust
 /// use std::path::Path;
-/// use darkicewolf50_actix_setup::clean_file_user_path;
-/// let result = clean_file_user_path("/database", "test".to_string(), ".txt").unwrap();
+/// use darkicewolf50_actix_setup::clean_user_file_req;
+/// let result = clean_user_file_req("/database", "test".to_string(), ".txt").unwrap();
 ///
 /// assert_eq!(result, Path::new("/database/test.txt"))
 /// ```
