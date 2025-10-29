@@ -1,0 +1,13 @@
+[package]
+name = "darkicewolf50-actix-setup"
+version = "0.1.0"
+edition = "2024"
+authors = ["Brock Tomlinson <brock@darkicewolf50.dev>"]
+license = "Apache-2.0"
+repository = "https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup"
+description = "Includes a health check function, and a logger"
+
+[dependencies]
+actix-web = "4"
+serde = { version = "1.0.227", features = ["derive"] }
+serde_json = "1.0.145"

@@ -1,0 +1,38 @@
+# name of the workflow.
+# this is optional.
+name: All Tests
+
+# events that will trigger this workflow.
+# here, we only have "pull_request", so the workflow will run
+# whenever we create a pull request.
+# other examples: [push] and [pull_request, push]
+on:
+  pull_request:
+
+  push:
+
+# each workflow must have at least one job.
+# jobs run in parallel by default (we can change that).
+# each job groups together a series of steps to accomplish a purpose.
+jobs:
+  deploy:
+    runs-on: ubuntu
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Forgejo registry
+        run: |
+          mkdir -p ~/.cargo
+          printf '[registries]\nforgejo = { index = "sparse+https://forge.ucalgarybaja.ca/api/packages/darkicewolf50/cargo/" }\n' > ~/.cargo/config.toml
+          printf '[registries.forgejo]\n' > ~/.cargo/credentials.toml
+          printf 'token = "Bearer %s"\n' "${{ secrets.FORGEJO_CRATES_TOKEN }}" >> ~/.cargo/credentials.toml
+
+      - name: Check
+        run: cargo check
+      
+      - name: All Tests
+        run: cargo test --no-fail-fast --quiet
+      - name: Publish
+        run: cargo publish --registry forgejo
