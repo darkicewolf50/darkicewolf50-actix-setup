@@ -21,5 +21,5 @@ health_check, sends back a json stating that the server is alive
 Add to your toml
 
 ```toml
-darkicewolf50-actix-setup = { version = "0.1.4", git = "https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup.git" }
+darkicewolf50-actix-setup = { version = "0.1.3", git = "https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup.git" }
 ```
