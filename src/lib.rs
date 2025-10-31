@@ -4,6 +4,9 @@ use serde_json::json;
 use std::path::{Path, PathBuf};
 use unicode_normalization::UnicodeNormalization;
 
+#[cfg(any(all(feature = "debug", debug_assertions), feature = "full"))]
+pub use swagger_docs::health_check_swagger;
+
 /// Logs out the request to the application, with method, and path it took to get there
 ///
 /// # Params
@@ -33,6 +36,8 @@ pub fn log_incoming(method: &'static str, path_source: &str) {
 
 /// A quick method to check if the server is alive and running
 /// This also keeps out scrapers from getting useful data
+/// 
+/// If you want swagger/open api docs use the [`health_check_swagger`] version instead
 ///
 /// # Params
 ///
@@ -75,6 +80,69 @@ pub async fn health_check() -> impl Responder {
     }))
 }
 
+// debug feature and debug build on OR ful feature on (always on)
+#[cfg(any(all(feature = "debug", debug_assertions), feature = "full"))]
+mod swagger_docs {
+    use serde::Serialize;
+    use utoipa::ToSchema;
+    
+    #[derive(Debug, Serialize, ToSchema)]
+    struct HeathMessage {
+        #[schema(example = "Hello World! I am alive, this does nothing")]
+        message: String,
+    }
+
+    /// A quick method to check if the server is alive and running
+    /// This also keeps out scrapers from getting useful data
+    /// 
+    /// This version includes documentation for utopia's swagger ui and for Open Api docs
+    /// But is exactly the same out as [`health_check`]
+    ///
+    /// # Params
+    ///
+    /// - nothing - needs nothing to check health of server
+    ///
+    /// # Returns
+    ///
+    /// - Json response with a alive message
+    ///
+    /// # Example
+    /// ```rust
+    /// use darkicewolf50_actix_setup::{ health_check_swagger, HeathMessage };
+    /// use actix_web::{web, test, App};
+    /// use serde_json::json;
+    ///
+    /// #[actix_web::test]
+    /// async fn test_hello() {
+    ///     let app = test::init_service(App::new().service(health_check_swagger)).await;
+    ///     let req = test::TestRequest::get().uri("/").to_request();
+    ///     let resp: serde_json::Value = test::call_and_read_body_json(&app, req).await;
+    ///
+    ///     assert_eq!(resp, HeathMessage {
+    ///        message: "Hello World! I am alive, this does nothing".to_string(),
+    ///     });
+    /// }
+    /// ```
+    /// # Author (s)
+    ///
+    /// - Brock <brock@darkicewolf50.dev>
+
+    #[utoipa::path(
+        get,
+        path = "/",
+        responses(
+            (status = 200, description = "Server is alive, will output the HeathMessage schema", body = [HeathMessage])
+        )
+    )]
+    #[get("/")]
+    pub async fn health_check_swagger() -> impl Responder {
+        log_incoming("GET", "/");
+        web::Json(HeathMessage {
+            message: "Hello World! I am alive, this does nothing".to_string(),
+        })
+    }
+
+}
 /// Logs out the request to the application, with method, and path it took to get there
 ///
 /// # Params

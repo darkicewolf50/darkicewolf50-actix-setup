@@ -18,8 +18,20 @@ health_check, sends back a json stating that the server is alive
 
 # Install
 
-Add to your toml
+Add one of these to your toml
+
+Minimal Version
 
 ```toml
-darkicewolf50-actix-setup = { version = "0.1.3", git = "https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup.git" }
+darkicewolf50-actix-setup = { version = "0.1.4", git = "https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup.git" }
+```
+
+Version with debug swagger/open api docs only
+```toml
+darkicewolf50-actix-setup = { version = "0.1.4", git = "https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup.git", features = ["debug"] }
+```
+
+Version with swagger/open api docs on always
+```toml
+darkicewolf50-actix-setup = { version = "0.1.4", git = "https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup.git", features = ["full"]}
 ```
