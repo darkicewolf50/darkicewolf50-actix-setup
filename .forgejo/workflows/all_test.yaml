@@ -16,7 +16,7 @@ on:
 # each job groups together a series of steps to accomplish a purpose.
 jobs:
   deploy:
-    runs-on: ubuntu
+    runs-on: rust
     steps:
 
       - name: Checkout repository
