@@ -11,3 +11,15 @@ Includes a health check function, and a logger
 log_incoming, logs the two strings to the terminal, is useful for knowing what was polled in seting and what was polled in the production
 
 health_check, sends back a json stating that the server is alive
+
+# Repository
+
+[https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup](https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup)
+
+# Install
+
+Add to your toml
+
+```toml
+darkicewolf50-actix-setup = { version = "0.1.4", git = "https://forge.ucalgarybaja.ca/darkicewolf50/darkicewolf50-actix-setup.git" }
+```
