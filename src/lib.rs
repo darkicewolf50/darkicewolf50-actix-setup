@@ -82,7 +82,7 @@ pub async fn health_check() -> impl Responder {
 
 // debug feature and debug build on OR ful feature on (always on)
 #[cfg(any(all(feature = "debug", debug_assertions), feature = "full"))]
-mod swagger_docs {
+pub mod swagger_docs {
     use crate::log_incoming;
     use actix_web::{Responder, get, web};
     use serde::Serialize;
