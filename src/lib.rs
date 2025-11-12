@@ -80,6 +80,68 @@ pub async fn health_check() -> impl Responder {
     }))
 }
 
+/// Logs out the request to the application, with method, and path it took to get there
+///
+/// # Params
+///
+/// - method - One of the HTTP request mothds.
+/// - path_source - the path you need to get to the function
+///
+/// # Returns
+///
+/// - Nothing, prints to terminal the method used and path it is going to
+///
+/// # Example
+/// ```rust
+/// use std::path::Path;
+/// use darkicewolf50_actix_setup::clean_user_file_req;
+///
+/// let result = clean_user_file_req("/database", "test", "txt").unwrap();
+///
+/// assert_eq!(result, Path::new("/database/test.txt"))
+/// ```
+///
+/// ```rust
+/// use std::path::Path;
+/// use darkicewolf50_actix_setup::clean_user_file_req;
+/// let result = clean_user_file_req("/database", "test", ".txt").unwrap();
+///
+/// assert_eq!(result, Path::new("/database/test.txt"))
+/// ```
+/// # Author (s)
+///
+/// - Brock <brock@darkicewolf50.dev>
+
+pub fn clean_user_file_req(
+    base_path: &str,
+    user_file_request: &str,
+    file_extension: &str,
+) -> Result<PathBuf, HttpResponse> {
+    let normalized_file_req = user_file_request.nfc().collect::<String>();
+
+    if normalized_file_req.is_empty() || normalized_file_req.len() > 255 {
+        return Err(HttpResponse::BadRequest().body("invalid file request"));
+    }
+    if normalized_file_req.chars().any(|c| c.is_control()) {
+        return Err(HttpResponse::BadRequest().body("invalid file request"));
+    }
+
+    let traversal_regex = Regex::new(r"(\.\.|/|\\)").unwrap();
+    if traversal_regex.is_match(&normalized_file_req) {
+        return Err(HttpResponse::BadRequest().body("invalid file request"));
+    }
+
+    let allowed_char = Regex::new(r"^[A-Za-z0-9 _\-\(\)\[\]]+$").unwrap();
+    if !allowed_char.is_match(&normalized_file_req) {
+        return Err(HttpResponse::BadRequest().body("invalid file request"));
+    }
+
+    let final_path = Path::new(base_path)
+        .join(&normalized_file_req)
+        .with_extension(file_extension.trim_start_matches('.'));
+    Ok(final_path)
+}
+
 // debug feature and debug build on OR ful feature on (always on)
 #[cfg(any(all(feature = "debug", debug_assertions), feature = "full"))]
 pub mod swagger_docs {
@@ -143,66 +205,4 @@ pub mod swagger_docs {
             message: "Hello World! I am alive, this does nothing".to_string(),
         })
     }
-}
-/// Logs out the request to the application, with method, and path it took to get there
-///
-/// # Params
-///
-/// - method - One of the HTTP request mothds.
-/// - path_source - the path you need to get to the function
-///
-/// # Returns
-///
-/// - Nothing, prints to terminal the method used and path it is going to
-///
-/// # Example
-/// ```rust
-/// use std::path::Path;
-/// use darkicewolf50_actix_setup::clean_user_file_req;
-///
-/// let result = clean_user_file_req("/database", "test", "txt").unwrap();
-///
-/// assert_eq!(result, Path::new("/database/test.txt"))
-/// ```
-///
-/// ```rust
-/// use std::path::Path;
-/// use darkicewolf50_actix_setup::clean_user_file_req;
-/// let result = clean_user_file_req("/database", "test", ".txt").unwrap();
-///
-/// assert_eq!(result, Path::new("/database/test.txt"))
-/// ```
-/// # Author (s)
-///
-/// - Brock <brock@darkicewolf50.dev>
-
-pub fn clean_user_file_req(
-    base_path: &str,
-    user_file_request: &str,
-    file_extension: &str,
-) -> Result<PathBuf, HttpResponse> {
-    let normalized_file_req = user_file_request.nfc().collect::<String>();
-
-    if normalized_file_req.is_empty() || normalized_file_req.len() > 255 {
-        return Err(HttpResponse::BadRequest().body("invalid file name"));
-    }
-    if normalized_file_req.chars().any(|c| c.is_control()) {
-        return Err(HttpResponse::BadRequest().body("invalid file name"));
-    }
-
-    let traversal_regex = Regex::new(r"(\.\.|/|\\)").unwrap();
-    if traversal_regex.is_match(&normalized_file_req) {
-        return Err(HttpResponse::BadRequest().body("invalid file name"));
-    }
-
-    let allowed_char = Regex::new(r"^[A-Za-z0-9 _\-\(\)\[\]]+$").unwrap();
-    if !allowed_char.is_match(&normalized_file_req) {
-        return Err(HttpResponse::BadRequest().body("invalid file name"));
-    }
-
-    let final_path = Path::new(base_path)
-        .join(&normalized_file_req)
-        .with_extension(file_extension.trim_start_matches('.'));
-
-    Ok(final_path)
 }
