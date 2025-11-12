@@ -184,20 +184,20 @@ pub fn clean_user_file_req(
     let normalized_file_req = user_file_request.nfc().collect::<String>();
 
     if normalized_file_req.is_empty() || normalized_file_req.len() > 255 {
-        return Err(HttpResponse::BadRequest().body("invalid blog name"));
+        return Err(HttpResponse::BadRequest().body("invalid file name"));
     }
     if normalized_file_req.chars().any(|c| c.is_control()) {
-        return Err(HttpResponse::BadRequest().body("invalid blog name"));
+        return Err(HttpResponse::BadRequest().body("invalid file name"));
     }
 
     let traversal_regex = Regex::new(r"(\.\.|/|\\)").unwrap();
     if traversal_regex.is_match(&normalized_file_req) {
-        return Err(HttpResponse::BadRequest().body("invalid blog name"));
+        return Err(HttpResponse::BadRequest().body("invalid file name"));
     }
 
     let allowed_char = Regex::new(r"^[A-Za-z0-9 _\-\(\)\[\]]+$").unwrap();
     if !allowed_char.is_match(&normalized_file_req) {
-        return Err(HttpResponse::BadRequest().body("invalid blog name"));
+        return Err(HttpResponse::BadRequest().body("invalid file name"));
     }
 
     let final_path = Path::new(base_path)
