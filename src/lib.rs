@@ -34,6 +34,51 @@ pub fn log_incoming(method: &'static str, path_source: &str) {
     println!("{} request, path: {}", method, path_source);
 }
 
+/// Logs out the request to the application, with method, path it took to get there and the X-forwarded-for Address it came from
+///
+/// # Params
+///
+/// - method - One of the HTTP request mothds.
+/// - path_source - the path you need to get to the function
+/// - ip_addr_x - the http request where the outside x-forwarded-for address exists
+///
+/// # Returns
+///
+/// - Nothing, prints to terminal the method used and path it is going to
+///
+/// # Example
+/// ```rust
+/// // this is how a public but internal module would be used by an outside user (ex_crate needs to be changed)
+/// use darkicewolf50_actix_setup::log_incoming_w_x;
+/// use actix_web::test::TestRequest;
+/// let req = TestRequest::default()
+///     .insert_header(("x-forwarded-for", "127.0.0.1"))
+///     .to_http_request();
+/// let result = log_incoming_w_x("GET", "/", req);
+/// // unit value and should only be printed to the terminal
+/// assert_eq!(result, ())
+/// ```
+/// # Author (s)
+///
+/// - Brock <brock@darkicewolf50.dev>
+
+pub fn log_incoming_w_x(
+    method: &'static str,
+    path_source: &str,
+    ip_addr_x: actix_web::HttpRequest,
+) {
+    let forwarded_for = ip_addr_x
+        .headers()
+        .get("x-forwarded-for")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("unknown");
+
+    println!(
+        "{} request from: {}, subaddress: {}",
+        method, forwarded_for, path_source
+    )
+}
+
 /// A quick method to check if the server is alive and running
 /// This also keeps out scrapers from getting useful data
 ///
