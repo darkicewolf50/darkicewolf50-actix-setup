@@ -65,7 +65,7 @@ pub fn log_incoming(method: &'static str, path_source: &str) {
 pub fn log_incoming_w_x(
     method: &'static str,
     path_source: &str,
-    ip_addr_x: actix_web::HttpRequest,
+    ip_addr_x: &actix_web::HttpRequest,
 ) {
     let forwarded_for = ip_addr_x
         .headers()
