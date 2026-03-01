@@ -125,7 +125,7 @@ pub fn log_incoming_w_x(
 
 #[get("/")]
 pub async fn health_check() -> impl Responder {
-    log_incoming("GET", "/");
+    log_incoming_w_x("GET", "/");
     web::Json(json!({
     "body": {
             "message": "Hello World! I am alive, this does nothing"
