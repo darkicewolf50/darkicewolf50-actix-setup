@@ -124,8 +124,8 @@ pub fn log_incoming_w_x(
 /// - Brock <brock@darkicewolf50.dev>
 
 #[get("/")]
-pub async fn health_check() -> impl Responder {
-    log_incoming_w_x("GET", "/");
+pub async fn health_check(req: actix_web::HttpRequest) -> impl Responder {
+    log_incoming_w_x("GET", "/", &req);
     web::Json(json!({
     "body": {
             "message": "Hello World! I am alive, this does nothing"
