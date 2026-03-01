@@ -67,15 +67,23 @@ pub fn log_incoming_w_x(
     path_source: &str,
     ip_addr_x: &actix_web::HttpRequest,
 ) {
-    let forwarded_for = ip_addr_x
+    let client_ip = ip_addr_x
         .headers()
-        .get("x-forwarded-for")
+        .get("cf-connecting-ip")
         .and_then(|v| v.to_str().ok())
-        .unwrap_or("unknown");
+        .unwrap_or_else(|| {
+            ip_addr_x
+            .headers()
+            .get("x-forwarded-for")
+            .and_then(|v| v.to_str().ok())
+            .and_then(|s| s.split(',').next().map(str::trim))
+            .unwrap_or("unknown")
+        })
+        ;
 
     println!(
         "{} request from: {}, subaddress: {}",
-        method, forwarded_for, path_source
+        method, client_ip, path_source
     )
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "darkicewolf50-actix-setup"
-version = "0.1.7"
+version = "0.2.0"
 edition = "2024"
 authors = ["Brock Tomlinson <brock@darkicewolf50.dev>"]
 license = "Apache-2.0"
@@ -9,11 +9,11 @@ description = "Includes a health check function, a logger and user input file in
 publish = ["forgejo"]
 
 [dependencies]
-actix-web = "4.12.0"
+actix-web = "4.13.0"
 serde = { version = "1.0.227", features = ["derive"] }
-serde_json = "1.0.145"
+serde_json = "1.0.149"
 unicode-normalization = "0.1.25"
-regex = "1"
+regex = "1.12.3"
 utoipa = { version = "5.4.0", optional = true }
 
 [features]
