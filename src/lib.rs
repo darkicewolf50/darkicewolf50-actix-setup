@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse, Responder, get, web};
+use actix_web::{HttpResponse, Responder, get};
 use regex::Regex;
 use serde_json::json;
 use std::path::{Path, PathBuf};
@@ -73,13 +73,12 @@ pub fn log_incoming_w_x(
         .and_then(|v| v.to_str().ok())
         .unwrap_or_else(|| {
             ip_addr_x
-            .headers()
-            .get("x-forwarded-for")
-            .and_then(|v| v.to_str().ok())
-            .and_then(|s| s.split(',').next().map(str::trim))
-            .unwrap_or("unknown")
-        })
-        ;
+                .headers()
+                .get("x-forwarded-for")
+                .and_then(|v| v.to_str().ok())
+                .and_then(|s| s.split(',').next().map(str::trim))
+                .unwrap_or("unknown")
+        });
 
     println!(
         "{} request from: {}, subaddress: {}",
@@ -124,13 +123,58 @@ pub fn log_incoming_w_x(
 /// - Brock <brock@darkicewolf50.dev>
 
 #[get("/")]
-pub async fn health_check(req: actix_web::HttpRequest) -> impl Responder {
-    log_incoming_w_x("GET", "/", &req);
-    web::Json(json!({
-    "body": {
-            "message": "Hello World! I am alive, this does nothing"
+pub async fn health_check() -> impl Responder {
+    log_incoming("GET", "/");
+    HttpResponse::Ok().json(json!(
+    {
+            "message": "Hello I am alive, this does nothing"
         }
-    }))
+    ))
+}
+
+/// A quick method to check if the server is alive and running and checks for x-forwarded-for and cloudflare proxies and displays the user's ip address
+/// This also keeps out scrapers from getting useful data
+///
+/// If you want swagger/open api docs use the [`health_check_swagger`] version instead
+///
+/// # Params
+///
+/// - nothing - needs nothing to check health of server
+///
+/// # Returns
+///
+/// - Json response with a alive message
+///
+/// # Example
+/// ```rust
+/// use darkicewolf50_actix_setup::health_check_reverse_proxy;
+/// use actix_web::{web, test, App};
+/// use serde_json::json;
+///
+/// #[actix_web::test]
+/// async fn test_hello() {
+///     let app = test::init_service(App::new().service(health_check_reverse_proxy)).await;
+///     let req = test::TestRequest::get().uri("/").to_request();
+///     let resp: serde_json::Value = test::call_and_read_body_json(&app, req).await;
+///
+///     assert_eq!(resp, json!({
+///         "body": {
+///             "message": "Hello I am alive, this does nothing"
+///         }
+///     }));
+/// }
+/// ```
+/// # Author (s)
+///
+/// - Brock <brock@darkicewolf50.dev>
+#[get("/")]
+pub async fn health_check_reverse_proxy(req: actix_web::HttpRequest) -> impl Responder {
+    log_incoming_w_x("GET", "/", &req);
+    HttpResponse::Ok().json(json!(
+    {
+            "message": "Hello I am alive, this does nothing"
+        }
+    ))
 }
 
 /// Logs out the request to the application, with method, and path it took to get there
@@ -213,7 +257,7 @@ pub mod swagger_docs {
     /// This also keeps out scrapers from getting useful data
     ///
     /// This version includes documentation for utopia's swagger ui and for Open Api docs
-    /// But is exactly the same out as [`health_check`]
+    /// But is exactly the same out as [`health_check`] and [`health_check_reverse_proxy`]
     ///
     /// # Params
     ///
