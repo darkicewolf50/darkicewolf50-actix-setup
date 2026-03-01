@@ -54,7 +54,7 @@ pub fn log_incoming(method: &'static str, path_source: &str) {
 /// let req = TestRequest::default()
 ///     .insert_header(("x-forwarded-for", "127.0.0.1"))
 ///     .to_http_request();
-/// let result = log_incoming_w_x("GET", "/", req);
+/// let result = log_incoming_w_x("GET", "/", &req);
 /// // unit value and should only be printed to the terminal
 /// assert_eq!(result, ())
 /// ```
