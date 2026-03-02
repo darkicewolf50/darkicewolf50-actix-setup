@@ -1,6 +1,6 @@
 [package]
 name = "darkicewolf50-actix-setup"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2024"
 authors = ["Brock Tomlinson <brock@darkicewolf50.dev>"]
 license = "Apache-2.0"

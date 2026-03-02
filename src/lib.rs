@@ -5,6 +5,8 @@ use std::path::{Path, PathBuf};
 use unicode_normalization::UnicodeNormalization;
 
 #[cfg(any(all(feature = "debug", debug_assertions), feature = "full"))]
+pub use swagger_docs::health_check_reverse_proxy;
+#[cfg(any(all(feature = "debug", debug_assertions), feature = "full"))]
 pub use swagger_docs::health_check_swagger;
 
 /// Logs out the request to the application, with method, and path it took to get there
