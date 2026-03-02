@@ -49,12 +49,12 @@ pub fn log_incoming(method: &'static str, path_source: &str) {
 /// # Example
 /// ```rust
 /// // this is how a public but internal module would be used by an outside user (ex_crate needs to be changed)
-/// use darkicewolf50_actix_setup::log_incoming_w_x;
+/// use darkicewolf50_actix_setup::log_incoming_proxy;
 /// use actix_web::test::TestRequest;
 /// let req = TestRequest::default()
 ///     .insert_header(("x-forwarded-for", "127.0.0.1"))
 ///     .to_http_request();
-/// let result = log_incoming_w_x("GET", "/", &req);
+/// let result = log_incoming_proxy("GET", "/", &req);
 /// // unit value and should only be printed to the terminal
 /// assert_eq!(result, ())
 /// ```
@@ -62,7 +62,7 @@ pub fn log_incoming(method: &'static str, path_source: &str) {
 ///
 /// - Brock <brock@darkicewolf50.dev>
 
-pub fn log_incoming_w_x(
+pub fn log_incoming_proxy(
     method: &'static str,
     path_source: &str,
     ip_addr_x: &actix_web::HttpRequest,
@@ -169,7 +169,7 @@ pub async fn health_check() -> impl Responder {
 /// - Brock <brock@darkicewolf50.dev>
 #[get("/")]
 pub async fn health_check_reverse_proxy(req: actix_web::HttpRequest) -> impl Responder {
-    log_incoming_w_x("GET", "/", &req);
+    log_incoming_proxy("GET", "/", &req);
     HttpResponse::Ok().json(json!(
     {
             "message": "Hello I am alive, this does nothing"
@@ -242,7 +242,7 @@ pub fn clean_user_file_req(
 // debug feature and debug build on OR ful feature on (always on)
 #[cfg(any(all(feature = "debug", debug_assertions), feature = "full"))]
 pub mod swagger_docs {
-    use crate::log_incoming;
+    use crate::{log_incoming, log_incoming_proxy};
     use actix_web::{Responder, get, web};
     use serde::Serialize;
     use utoipa::ToSchema;
@@ -257,7 +257,7 @@ pub mod swagger_docs {
     /// This also keeps out scrapers from getting useful data
     ///
     /// This version includes documentation for utopia's swagger ui and for Open Api docs
-    /// But is exactly the same out as [`health_check`] and [`health_check_reverse_proxy`]
+    /// But is exactly the same out as [`health_check`]
     ///
     /// # Params
     ///
@@ -269,7 +269,7 @@ pub mod swagger_docs {
     ///
     /// # Example
     /// ```rust
-    /// use darkicewolf50_actix_setup::{ health_check_swagger, HeathMessage };
+    /// use darkicewolf50_actix_setup::swagger_docs::{ health_check_swagger };
     /// use actix_web::{web, test, App};
     /// use serde_json::json;
     ///
@@ -279,9 +279,13 @@ pub mod swagger_docs {
     ///     let req = test::TestRequest::get().uri("/").to_request();
     ///     let resp: serde_json::Value = test::call_and_read_body_json(&app, req).await;
     ///
-    ///     assert_eq!(resp, HeathMessage {
-    ///        message: "Hello World! I am alive, this does nothing".to_string(),
-    ///     });
+    ///     assert_eq!(resp, json!({
+    ///         "message": "Hello I am alive, this does nothing"
+    ///     }));
+    ///     // same as the private HeathMessage
+    ///     // assert_eq!(resp, HeathMessage {
+    ///     //     message: "Hello I am alive, this does nothing".to_string(),
+    ///     // });
     /// }
     /// ```
     /// # Author (s)
@@ -299,7 +303,61 @@ pub mod swagger_docs {
     pub async fn health_check_swagger() -> impl Responder {
         log_incoming("GET", "/");
         web::Json(HeathMessage {
-            message: "Hello World! I am alive, this does nothing".to_string(),
+            message: "Hello I am alive, this does nothing".to_string(),
+        })
+    }
+
+    /// A quick method to check if the server is alive and running and checks for x-forwarded-for and cloudflare proxies and displays the user's ip address
+    /// This also keeps out scrapers from getting useful data
+    ///
+    /// This version includes documentation for utopia's swagger ui and for Open Api docs
+    /// But is exactly the same out as [`health_check_reverse_proxy`]
+    ///
+    /// # Params
+    ///
+    /// - nothing - needs nothing to check health of server
+    ///
+    /// # Returns
+    ///
+    /// - Json response with a alive message
+    ///
+    /// # Example
+    /// ```rust
+    /// use darkicewolf50_actix_setup::swagger_docs::{ health_check_proxy_swagger };
+    /// use actix_web::{web, test, App};
+    /// use serde_json::json;
+    ///
+    /// #[actix_web::test]
+    /// async fn test_hello() {
+    ///     let app = test::init_service(App::new().service(health_check_proxy_swagger)).await;
+    ///     let req = test::TestRequest::get().uri("/").to_request();
+    ///     let resp: serde_json::Value = test::call_and_read_body_json(&app, req).await;
+    ///
+    ///     assert_eq!(resp, json!({
+    ///         "message": "Hello I am alive, this does nothing"
+    ///     }));
+    ///     // same as the private HeathMessage
+    ///     // assert_eq!(resp, HeathMessage {
+    ///     //     message: "Hello I am alive, this does nothing".to_string(),
+    ///     // });
+    /// }
+    /// ```
+    /// # Author (s)
+    ///
+    /// - Brock <brock@darkicewolf50.dev>
+
+    #[utoipa::path(
+        get,
+        path = "/",
+        responses(
+            (status = 200, description = "Server is alive, will output the HeathMessage schema", body = [HeathMessage])
+        )
+    )]
+    #[get("/")]
+    pub async fn health_check_proxy_swagger(req: actix_web::HttpRequest) -> impl Responder {
+        log_incoming_proxy("GET", "/", &req);
+        web::Json(HeathMessage {
+            message: "Hello I am alive, this does nothing".to_string(),
         })
     }
 }
